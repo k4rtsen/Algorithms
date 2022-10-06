@@ -1,1 +1,8 @@
+# libs
 edu/
+
+# java class
+*.class
+
+# other files
+percolation/

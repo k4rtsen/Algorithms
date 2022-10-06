@@ -5,7 +5,7 @@ interface Operation {
 }
 
 public class Percolation {
-    private UnionFind uf;
+    private WeightedQuickUnionUF uf;
     private boolean[][] grid;
 
     /**
@@ -14,12 +14,12 @@ public class Percolation {
      * @param n the size of grid
      * 
      * @throws IllegalArgumentException if {@code n <= 0}
-    */
+     */
     public Percolation(int n) {
         try {
             if (n <= 0)
                 throw new IllegalArgumentException("Out of range");
-            uf = new UnionFind(n * n);
+            uf = new WeightedQuickUnionUF(n * n);
             grid = new boolean[n][n];
             for (int i = 0; i < grid.length; i++)
                 for (int j = 0; j < grid[i].length; j++)
@@ -30,6 +30,27 @@ public class Percolation {
         }
     }
 
+    // trash
+    // ----------------------------------------------------
+    public void open(int row, int col) {
+        row--;
+        col--;
+        open0(row, col);
+    }
+
+    public boolean isOpen(int row, int col) {
+        row--;
+        col--;
+        return isOpen0(row, col);
+    }
+
+    public boolean isFull(int row, int col) {
+        row--;
+        col--;
+        return isFull0(row, col);
+    }
+    // ----------------------------------------------------
+
     /**
      * Opens the site {@code grid[row][col]} if it is not open already
      * 
@@ -39,7 +60,7 @@ public class Percolation {
      * @throws IllegalArgumentException if {@code 0 < row || row >= grid.length 
      * || 0 < col || col >= grid.length}
      */
-    public void open(int row, int col) {
+    public void open0(int row, int col) {
         try {
             if (0 > row || row >= grid.length || 0 > col || col >= grid.length)
                 throw new IllegalArgumentException("Out of range");
@@ -56,12 +77,13 @@ public class Percolation {
      * 
      * @param row - row in grid, where {@code 0 <= row < grid.length}
      * @param col - column in grid, where {@code 0 <= col < grid.length}
-     * @return {@code true} if {@code grid[row][col]} is open, {@code false} otherwise
+     * @return {@code true} if {@code grid[row][col]} is open, {@code false}
+     *         otherwise
      * 
      * @throws IllegalArgumentException if {@code 0 < row || row >= grid.length 
      * || 0 < col || col >= grid.length}
      */
-    public boolean isOpen(int row, int col) {
+    public boolean isOpen0(int row, int col) {
         try {
             if (0 > row || row >= grid.length || 0 > col || col >= grid.length)
                 throw new IllegalArgumentException("Out of range");
@@ -74,15 +96,17 @@ public class Percolation {
 
     // is the site (row, col) full?
     // is the site connected with any sites on top row?
-    public boolean isFull(int row, int col) {
+    public boolean isFull0(int row, int col) {
         try {
             if (0 > row || row >= grid.length || 0 > col || col >= grid.length)
                 throw new IllegalArgumentException("Out of range");
             for (int i = 0; i < grid.length; i++) {
-                int p = fromGridToUF(row, col);
-                // the condition check with each sites in the top row
-                if (uf.connected(p, i))
-                    return true;
+                if (isOpen0(row, col)) {
+                    int p = fromGridToUF(row, col);
+                    // the condition check with each sites in the top row
+                    if (uf.connected(p, i))
+                        return true;
+                }
             }
             return false;
         } catch (IllegalArgumentException ex) {
@@ -103,9 +127,11 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        for (int i = 0; i < grid.length; i++)
-            if (isFull(grid.length - 1, i))
-                return true;
+        for (int i = 0; i < grid.length; i++) {
+            if (isOpen0(grid.length - 1, i))
+                if (isFull0(grid.length - 1, i))
+                    return true;
+        }
         return false;
     }
 
@@ -114,11 +140,11 @@ public class Percolation {
             System.out.printf("{ ");
             for (boolean b : sub_arr) {
                 if (b)
-                    System.out.printf("o");
+                    System.out.printf(". ");
                 else
-                    System.out.printf("x");
+                    System.out.printf("o ");
             }
-            System.out.printf(" }");
+            System.out.printf("}");
             System.out.println();
         }
     }
@@ -142,39 +168,42 @@ public class Percolation {
         };
 
         if (row != 0)
-            if (isOpen(row - 1, col))
+            if (isOpen0(row - 1, col))
                 op.connect(row, col, row - 1, col);
 
         if (row != grid.length - 1)
-            if (isOpen(row + 1, col)) {
+            if (isOpen0(row + 1, col)) {
                 op.connect(row, col, row + 1, col);
             }
 
         if (col != 0)
-            if (isOpen(row, col - 1))
+            if (isOpen0(row, col - 1))
                 op.connect(row, col, row, col - 1);
 
         if (col != grid.length - 1)
-            if (isOpen(row, col + 1))
+            if (isOpen0(row, col + 1))
                 op.connect(row, col, row, col + 1);
     }
 
     // test client (optional)
     public static void main(String[] args) {
-        final int N = 5;
-        Percolation p = new Percolation(N);
+        int n = StdIn.readInt();
+        Percolation p = new Percolation(n);
 
-        int i = 0;
         while (!p.percolates()) {
-            i++;
-            int row = StdRandom.uniformInt(N);
-            int col = StdRandom.uniformInt(N);
-            if (!p.isOpen(row, col))
-                p.open(row, col);
-                System.out.printf("Row: %d\tCol: %d\n", row, col);
+            int row = StdRandom.uniformInt(n);
+            int col = StdRandom.uniformInt(n);
+            if (!p.isOpen0(row, col))
+                p.open0(row, col);
         }
-        System.out.println("iterations: " + i);
-        System.out.println("Count of open sites: " + p.numberOfOpenSites());
+
+        // while (!StdIn.isEmpty()) {
+        // int row = StdIn.readInt() - 1;
+        // int col = StdIn.readInt() - 1;
+        // if (!p.isOpen0(row, col))
+        // p.open0(row, col);
+        // }
+        System.out.println(p.numberOfOpenSites());
         p.printGrid();
     }
 }
