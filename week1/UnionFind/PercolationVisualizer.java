@@ -81,7 +81,6 @@ public class PercolationVisualizer {
             StdDraw.show();
             StdDraw.pause(DELAY);
         }
-        perc.printGrid();
     }
 }
 
