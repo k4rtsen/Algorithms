@@ -181,6 +181,7 @@ public class Percolation {
 
     // test client (optional)
     public static void main(String[] args) {
+        StdOut.print("Input the size of grid: ");
         int n = StdIn.readInt();
         Percolation p = new Percolation(n);
         /**
@@ -193,7 +194,7 @@ public class Percolation {
             if (!p.isOpen0(row, col))
                 p.open0(row, col);
         }
-        var time = timer.elapsedTime();
+        double time = timer.elapsedTime();
 
         /**
          * for input.txt experiment

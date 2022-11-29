@@ -57,7 +57,7 @@ public class PercolationStats {
         }
         StopwatchCPU timer = new StopwatchCPU();
         PercolationStats ps = new PercolationStats(n, t);
-        var time = timer.elapsedTime();
+        double time = timer.elapsedTime();
         StdOut.printf("%f seconds\n", time);
         StdOut.printf("mean\t\t\t= %f\n", ps.mean());
         StdOut.printf("stddev\t\t\t= %f\n", ps.stddev());
