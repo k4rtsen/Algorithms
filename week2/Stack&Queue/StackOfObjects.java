@@ -1,5 +1,8 @@
-public class Stack<Item> {
-    private Node first = null;
+public class StackOfObjects<Item> {
+    private Node first;
+    {
+        first = null;
+    }
 
     private class Node {
         Item item;
@@ -24,6 +27,10 @@ public class Stack<Item> {
     }
 
     public void displayStack() {
+        if (first == null) {
+            System.out.println("Stack is empty");
+            return;
+        }
         Node temp = first;
         int i = 0;
         while (temp != null) {
@@ -33,7 +40,7 @@ public class Stack<Item> {
     }
 
     public static void main(String[] args) {
-        Stack<Integer> stack = new Stack<>();
+        StackOfObjects<Integer> stack = new StackOfObjects<>();
         stack.push(1);
         stack.push(2);
         stack.push(3);
